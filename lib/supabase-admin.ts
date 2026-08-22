@@ -5,8 +5,20 @@ const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 if (!url || !serviceRoleKey) {
+  const missing = [
+    !url && "NEXT_PUBLIC_SUPABASE_URL",
+    !serviceRoleKey && "SUPABASE_SERVICE_ROLE_KEY",
+  ]
+    .filter(Boolean)
+    .join(" and ");
+
+  // Named individually, and pointing at the right place depending on where
+  // this is running, because the first time anyone sees this message it will
+  // be in a build log rather than a terminal.
   throw new Error(
-    "Missing NEXT_PUBLIC_SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY. Copy .env.example to .env.local and fill both in.",
+    process.env.VERCEL
+      ? `Missing ${missing}. Add it under Project Settings, Environment Variables, then redeploy.`
+      : `Missing ${missing}. Copy .env.example to .env.local and fill it in.`,
   );
 }
 
